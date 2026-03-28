@@ -1,0 +1,35 @@
+import requests
+import json
+
+# Thông tin cấu hình từ đối tác cung cấp API
+API_URL = "https://partner-api.com/v1/charging"
+PARTNER_ID = "YOUR_ID"
+PARTNER_KEY = "YOUR_KEY"
+
+def nap_the_tu_dong(loai_the, menh_gia, seri, ma_the, request_id):
+    """
+    Gửi thông tin thẻ lên hệ thống xử lý
+    """
+    payload = {
+        'telco': loai_the,      # Viettel, Mobi, Vina...
+        'amount': menh_gia,    # 10000, 20000...
+        'serial': seri,
+        'code': ma_the,
+        'request_id': request_id, # Mã giao dịch duy nhất của bạn
+        'partner_id': PARTNER_ID,
+        'sign': "tao_chu_ky_bao_mat_tai_day" # Thường là MD5 hoặc SHA256
+    }
+
+    try:
+        response = requests.post(API_URL, data=payload)
+        result = response.json()
+        
+        if result['status'] == 1:
+            return "Thẻ đã được gửi lên hệ thống, vui lòng chờ xử lý!"
+        else:
+            return f"Lỗi: {result['message']}"
+    except Exception as e:
+        return f"Không thể kết nối API: {str(e)}"
+
+# Ví dụ gọi hàm
+# print(nap_the_tu_dong("VIETTEL", 100000, "10001234567", "1234567890123", "BILL001"))
